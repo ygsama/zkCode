@@ -13,8 +13,7 @@ import org.junit.Test;
 
 public class SimpleZkClient {
 
-	private static final String connStr = "106.14.149.247:2181,101.132.106.110:2181,116.196.88.198:2181";
-//	private static final String connStr = "master:2181,hadoop1:2181,hadoop2:2181";
+	private static final String connStr = "master:2181,hadoop1:2181,hadoop2:2181";
 	private static final int sessionTimeout = 2000;
 	private static ZooKeeper client = null;
 
