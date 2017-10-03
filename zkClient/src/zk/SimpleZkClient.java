@@ -15,7 +15,7 @@ public class SimpleZkClient {
 
 	private static final String connStr = "master:2181,hadoop1:2181,hadoop2:2181";
 	private static final int sessionTimeout = 2000;
-	private static ZooKeeper client = null;
+	private ZooKeeper client = null;
 
 	@Before
 	public void init() throws Exception{
@@ -27,6 +27,7 @@ public class SimpleZkClient {
 						System.out.println(event.getType()+"\t"+event.getPath()+"\tconnected");
 					}
 				});
+		Thread.sleep(1000);
 	}
 	
 	/**
@@ -35,7 +36,7 @@ public class SimpleZkClient {
 	@Test
 	public void testCreate() throws Exception{
 		
-		String nodePath = client.create("/eclipse", "hello zk".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		String nodePath = client.create("/servers", "hello zk".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		System.out.println(nodePath);
 	}
 	
@@ -65,7 +66,7 @@ public class SimpleZkClient {
 	@Test
 	public void deleteZndoe() throws Exception{
 		
-		client.delete("/eclipse", -1);
+		client.delete("/servers/server0000000000", -1);
 	}
 	
 	@Test
