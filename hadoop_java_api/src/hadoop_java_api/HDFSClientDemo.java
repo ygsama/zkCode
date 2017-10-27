@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -29,13 +30,17 @@ public class HDFSClientDemo {
 	@Before
 	public void init() throws Exception {
 		
-		Configuration conf = new Configuration();
-//		conf.set("fs.DefaultFS", "hdfs://master:9000");
+		conf = new Configuration();
+		conf.set("fs.DefaultFS", "hdfs://master:9000");
 		// 拿到操作hdfs的客户端实例对象
 		fs = FileSystem.get(new URI("hdfs://master:9000"),conf,"root");
 		
 	}
 	
+	/**
+	 * 上传
+	 * @throws Exception
+	 */
 	@Test
 	public void testUpload() throws Exception{
 
@@ -43,6 +48,10 @@ public class HDFSClientDemo {
 		fs.close();
 	}
 	
+	/**
+	 * 下载
+	 * @throws Exception
+	 */
 	@Test
 	public void testDownLoad() throws Exception{
 		
@@ -50,12 +59,15 @@ public class HDFSClientDemo {
 		fs.close();
 	}
 	
+	/**
+	 * 打印配置文件
+	 */
 	@Test
 	public void testConf(){
-		Iterator<Entry<String, String>> iterator = conf.iterator();
+		Iterator<Entry<String, String>> iterator =  conf.iterator();
 		while (iterator.hasNext()) {
 			Entry<String, String> entry = iterator.next();
-			System.out.println(entry.getValue() + "--" + entry.getValue());//conf加载的内容
+			System.out.println(entry.getKey() + "--" + entry.getValue());//conf加载的内容
 		}
 	}
 	
@@ -77,6 +89,10 @@ public class HDFSClientDemo {
 		System.out.println(delete);
 	}
 	
+	/**
+	 * 打印文件列表
+	 * @throws Exception
+	 */
 	@Test
 	public void listTest() throws Exception{
 		
@@ -90,9 +106,41 @@ public class HDFSClientDemo {
 			LocatedFileStatus next = listFiles.next();
 			String name = next.getPath().getName();
 			Path path = next.getPath();
-			System.out.println(name + "---" + path.toString());
+			System.out.println(name + "|------------------|" + path.toString());
 		}
 	}
+	
+	
+	/**
+	 * 递归列出指定目录下所有子文件夹中的文件
+	 * @throws Exception
+	 */
+	@Test
+	public void testLs() throws Exception {
+		
+		RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"), true);
+		
+		while(listFiles.hasNext()){
+			LocatedFileStatus fileStatus = listFiles.next();
+			System.out.println("blocksize: " +fileStatus.getBlockSize());
+			System.out.println("owner: " +fileStatus.getOwner());
+			System.out.println("Replication: " +fileStatus.getReplication());
+			System.out.println("Permission: " +fileStatus.getPermission());
+			System.out.println("Name: " +fileStatus.getPath().getName());
+			System.out.println("------------------");
+			BlockLocation[] blockLocations = fileStatus.getBlockLocations();
+			for(BlockLocation b:blockLocations){
+				System.out.println("块起始偏移量: " +b.getOffset());
+				System.out.println("块长度:" + b.getLength());
+				//块所在的datanode节点
+				String[] datanodes = b.getHosts();
+				for(String dn:datanodes){
+				System.out.println("datanode:" + dn);
+				}
+			}
+		}
+	}
+	
 	
 //	public static void main(String[] args) throws Exception {
 //		Configuration conf = new Configuration();
