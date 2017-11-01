@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 /**
  * 13480253104 180 180 360 13502468823 7335 110349 117684 13560436666 1116 954
  * 2070
- * 
+ * 增加一个mr进行排序
  * @author
  * 
  */
@@ -50,9 +50,8 @@ public class FlowCountSort {
 
 	/**
 	 * 根据key来掉, 传过来的是对象, 每个对象都是不一样的, 所以每个对象都调用一次reduce方法
-	  * @author: 张政
-	  * @date: 2016年4月11日 下午7:08:18
-	  * @package_name: day07.sample
+	 * @author G
+	 *
 	 */
 	static class FlowCountSortReducer extends Reducer<FlowBean, Text, Text, FlowBean> {
 

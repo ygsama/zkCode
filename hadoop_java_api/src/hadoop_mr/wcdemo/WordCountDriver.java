@@ -5,7 +5,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 /**
@@ -31,6 +33,10 @@ public class WordCountDriver {
 		job.setMapperClass(WordCountMapper.class);
 		job.setReducerClass(WordCountReducer.class);
 		
+		// 指定哪个类作为combiner
+//		job.setCombinerClass(WordcountCombiner.class);
+		job.setCombinerClass(WordCountReducer.class);
+		
 		// 指定mapper输出的键值对数据类型
 		job.setMapOutputValueClass(IntWritable.class);
 		job.setMapOutputKeyClass(Text.class);
@@ -38,6 +44,12 @@ public class WordCountDriver {
 		// 指定最终输出的键值对的数据类型
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
+		
+		// 若不设置InputFormat 默认使用TextInputFormat.class
+//		job.setInputFormatClass(TextInputFormat.class);
+		job.setInputFormatClass(CombineTextInputFormat.class);
+		CombineTextInputFormat.setMaxInputSplitSize(job, 4*1024*1024);
+		CombineTextInputFormat.setMinInputSplitSize(job, 2*1024*1024);
 		
 		// job输入文件的所在目录
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
